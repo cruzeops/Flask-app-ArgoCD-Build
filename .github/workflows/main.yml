@@ -7,7 +7,9 @@ on:
     paths:
       - '**.*'
       - 'Dockerfile'
-
+permissions:
+  contents: write
+  
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -70,3 +72,16 @@ jobs:
 
           echo "After update:"
           grep "image:" deploy/deploy.yaml || true
+
+    # Commit and push the updated manifest file back to the repository
+      - name: Commit updated manifest
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add deploy/deploy.yaml
+          git commit -m "Update manifest image tag to ${{ env.VERSION }}" || echo "No changes to commit"
+
+      - name: Push updated manifest
+        run: |
+          git push origin master
