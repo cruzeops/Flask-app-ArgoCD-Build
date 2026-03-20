@@ -54,7 +54,7 @@ jobs:
           set -euo pipefail
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install flake8 pytest pytest-cov
+          pip install flake8 pytest
 
       # Step 5: Run linting (code quality checks)
       - name: Run lint checks
@@ -64,12 +64,12 @@ jobs:
           flake8 --ignore=E501,F401 .   
 
       # Step 6: Run unit tests
-      - name: Run unit tests with coverage
+      - name: Run unit tests
         shell: bash
         run: |
           set -euo pipefail
           if find . -type f \( -name "test_*.py" -o -name "*_test.py" \) | grep -q .; then
-            pytest --cov=. --cov-report=xml
+            pytest -q
           else
             echo "No test files found, skipping unit tests for now."
           fi
