@@ -26,7 +26,9 @@ jobs:
     steps:
     # checkout the code, set up Python, install dependencies, run tests, and build the Docker image
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       
     # Set up Python 3.8, and Docker Buildx for building the Docker image
       - name: Set up Python 3.9
@@ -72,6 +74,7 @@ jobs:
             -Dsonar.organization=${{ env.SONAR_ORGANIZATION }}
             -Dsonar.projectKey=${{ env.SONAR_PROJECT_KEY }}
             -Dsonar.sources=.
+            -Dsonar.python.version=3.9
             -Dsonar.qualitygate.wait=true
             -Dsonar.qualitygate.timeout=300
           
