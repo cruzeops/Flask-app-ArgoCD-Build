@@ -106,9 +106,8 @@ Note: you need to change the name of your image, according to your dockerhub use
     mkdir -p .github/Workflows
     ```
 2. Create your first pipeline for TEST and BUILD the image. make sure it should be yaml file
-    ```
+```
 name: Test and Build
-
 on:
   push:
     branches: 
