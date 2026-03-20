@@ -88,18 +88,18 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+
           SHORT_SHA="${GITHUB_SHA::7}"
           VERSION="v${SHORT_SHA}-${GITHUB_RUN_NUMBER}"
+
+          IMAGE_NAME="${{ env.IMAGE_NAME }}"
           IMAGE_VERSION="${IMAGE_NAME}:${VERSION}"
           IMAGE_LATEST="${IMAGE_NAME}:latest"
 
-          # Make the generated values available to later steps in this job
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
-          echo "SHORT_SHA=$SHORT_SHA" >> "$GITHUB_ENV"
           echo "IMAGE_VERSION=$IMAGE_VERSION" >> "$GITHUB_ENV"
           echo "IMAGE_LATEST=$IMAGE_LATEST" >> "$GITHUB_ENV"
 
-          # Publish values as job outputs for the deploy job
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "image_version=$IMAGE_VERSION" >> "$GITHUB_OUTPUT"
 
@@ -188,6 +188,13 @@ jobs:
         run: |
           set -euo pipefail
           grep "image:" "gitops/${GITOPS_MANIFEST_PATH}"
+
+
+      - name: Debug received values
+        run: |
+          echo "VERSION=${VERSION}"
+          echo "IMAGE_VERSION=${IMAGE_VERSION}"
+
 
       # Step 17: Update the Kubernetes manifest to the newly built image tag
       - name: Update GitOps manifest image tag
