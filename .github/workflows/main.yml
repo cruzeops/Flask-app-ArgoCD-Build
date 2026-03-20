@@ -182,35 +182,49 @@ jobs:
           set -euo pipefail
           test -f "gitops/${GITOPS_MANIFEST_PATH}"
 
-      # Step 16: Show the current image value for visibility before changing it
+      # Step 16: Show the target file and current image value before changing it
       - name: Show current image in GitOps manifest
         shell: bash
         run: |
           set -euo pipefail
-          grep "image:" "gitops/${GITOPS_MANIFEST_PATH}"
+          TARGET_FILE="gitops/${GITOPS_MANIFEST_PATH}"
+          echo "GitOps repo: ${GITOPS_REPO}"
+          echo "GitOps branch: ${GITOPS_BRANCH}"
+          echo "Target file: ${TARGET_FILE}"
+          echo "Current image line:"
+          grep -nE '^[[:space:]]*image:' "${TARGET_FILE}"
 
 
-      - name: Debug received values
-        run: |
-          echo "VERSION=${VERSION}"
-          echo "IMAGE_VERSION=${IMAGE_VERSION}"
-
-
-      # Step 17: Update the Kubernetes manifest to the newly built image tag
+      # Step 17: Update the raw Kubernetes manifest with the newly built image tag
       - name: Update GitOps manifest image tag
         shell: bash
         run: |
           set -euo pipefail
 
+          TARGET_FILE="gitops/${GITOPS_MANIFEST_PATH}"
+
+          echo "VERSION=${VERSION}"
+          echo "IMAGE_VERSION=${IMAGE_VERSION}"
+
+          # Fail fast if the manifest does not contain a raw Kubernetes image field
+          grep -qE '^[[:space:]]*image:' "${TARGET_FILE}"
+
           # Replace the current image line with the image produced by the build job
-          sed -i "s|image: .*|image: ${IMAGE_VERSION}|g" \
-            "gitops/${GITOPS_MANIFEST_PATH}"
+          sed -i -E "s|^([[:space:]]*image:[[:space:]]*).*$|\1${IMAGE_VERSION}|g" "${TARGET_FILE}"
 
-          # Print the updated line to confirm the manifest change
+          # Print the updated value to confirm the manifest change
           echo "Updated manifest:"
-          grep "image:" "gitops/${GITOPS_MANIFEST_PATH}"
+          grep -nE '^[[:space:]]*image:' "${TARGET_FILE}"
 
-      # Step 18: Commit the manifest update into the GitOps repository
+      # Step 18: Show the exact Git diff before committing the GitOps change
+      - name: Show GitOps diff
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd gitops
+          git diff -- "${GITOPS_MANIFEST_PATH}" || true
+
+      # Step 19: Commit the manifest update into the GitOps repository
       - name: Commit GitOps manifest change
         shell: bash
         run: |
@@ -228,7 +242,7 @@ jobs:
 
           git commit -m "Update demo-app image tag to ${VERSION}"
 
-      # Step 19: Push the GitOps commit so ArgoCD can detect and apply it
+      # Step 20: Push the GitOps commit so ArgoCD can detect and apply it
       - name: Push GitOps manifest change
         shell: bash
         run: |
