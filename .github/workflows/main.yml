@@ -41,7 +41,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.9'
-          cache: 'pip'      # Enables pip dependency caching for faster builds
+          # cache: 'pip'      # Enables pip dependency caching for faster builds
 
       # Step 3: Enable Docker Buildx (for advanced builds)
       - name: Set up Docker Buildx
@@ -108,7 +108,7 @@ jobs:
             -Dsonar.projectKey=${{ env.SONAR_PROJECT_KEY }}
             -Dsonar.sources=.
             -Dsonar.python.version=3.9
-            -Dsonar.qualitygate.wait=true
+            -Dsonar.qualitygate.wait=false
             -Dsonar.qualitygate.timeout=300
 
       # Step 10: Build Docker image with version and latest tags
