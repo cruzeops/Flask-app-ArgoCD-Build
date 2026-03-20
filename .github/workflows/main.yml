@@ -109,13 +109,13 @@ jobs:
           IMAGE_VERSION="${IMAGE_NAME}:${VERSION}"
           IMAGE_LATEST="${IMAGE_NAME}:latest"
 
-          # Export values for later steps in this job
+          # Make available to later steps in this build job
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
           echo "SHORT_SHA=$SHORT_SHA" >> "$GITHUB_ENV"
           echo "IMAGE_VERSION=$IMAGE_VERSION" >> "$GITHUB_ENV"
           echo "IMAGE_LATEST=$IMAGE_LATEST" >> "$GITHUB_ENV"
 
-          # Export values as job outputs for the deploy job
+          # Make available to other jobs
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "image_version=$IMAGE_VERSION" >> "$GITHUB_OUTPUT"
           echo "image_latest=$IMAGE_LATEST" >> "$GITHUB_OUTPUT"
