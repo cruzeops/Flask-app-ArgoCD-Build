@@ -79,7 +79,8 @@ jobs:
           token: ${{ secrets.ARGOCD_REPO_TOKEN }}
           path: gitops
 
-      - name: List GitOps repo contents
+    # List the contents of the GitOps repository and the manifest file before updating it
+      - name: List GitOps repo contents before update
         run: |
             ls -la gitops
             cat gitops/${{ env.GITOPS_MANIFEST_PATH }}
@@ -89,6 +90,12 @@ jobs:
         run: |
           sed -i "s|image: .*|image: ${{ env.IMAGE_NAME }}:${{ env.VERSION }}|g" "gitops/${{ env.GITOPS_MANIFEST_PATH }}"
           grep "image:" "gitops/${{ env.GITOPS_MANIFEST_PATH }}"
+
+    # List the contents of the GitOps repository and the manifest file after updating it
+      - name: List GitOps repo contents after update
+        run: |
+            ls -la gitops
+            cat gitops/${{ env.GITOPS_MANIFEST_PATH }}
 
     # Commit and push the manifest change to the GitOps repository
       - name: Commit updated GitOps manifest
