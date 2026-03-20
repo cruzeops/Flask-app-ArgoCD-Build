@@ -17,9 +17,9 @@ jobs:
     env:
       VERSION: ""
       IMAGE_NAME: ${{ secrets.DOCKER_USERNAME }}/demo-app
-      GITOPS_REPO: ${{ vars.ARGOCD_REPO || 'your-org/argocd-manifests' }}
+      GITOPS_REPO: ${{ vars.ARGOCD_REPO || 'cruzeops/demo-app-gitops' }}
       GITOPS_BRANCH: ${{ vars.ARGOCD_BRANCH || 'main' }}
-      GITOPS_MANIFEST_PATH: ${{ vars.ARGOCD_MANIFEST_PATH || 'deploy/deploy.yaml' }}
+      GITOPS_MANIFEST_PATH: ${{ vars.ARGOCD_MANIFEST_PATH || 'deploy.yaml' }}
 
     steps:
     # checkout the code, set up Python, install dependencies, run tests, and build the Docker image
