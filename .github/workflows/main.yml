@@ -85,8 +85,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          SHORT_SHA="${GITHUB_SHA::7}"                     # Short git commit hash
-          VERSION="v${SHORT_SHA}-${GITHUB_RUN_NUMBER}"     # Unique version tag
+          SHORT_SHA="${GITHUB_SHA::7}"
+          VERSION="v${SHORT_SHA}-${GITHUB_RUN_NUMBER}"
 
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
           echo "SHORT_SHA=$SHORT_SHA" >> "$GITHUB_ENV"
@@ -106,7 +106,7 @@ jobs:
             -Dsonar.projectKey=${{ env.SONAR_PROJECT_KEY }}
             -Dsonar.sources=.
             -Dsonar.python.version=3.9
-            -Dsonar.qualitygate.wait=true         # Block pipeline if gate fails
+            -Dsonar.qualitygate.wait=true
             -Dsonar.qualitygate.timeout=300
 
       # Step 10: Build Docker image with version and latest tags
