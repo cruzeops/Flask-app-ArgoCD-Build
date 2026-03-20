@@ -42,8 +42,6 @@ jobs:
     # These outputs are passed to the deploy job
     outputs:
       version: ${{ steps.meta.outputs.version }}
-      image_version: ${{ steps.meta.outputs.image_version }}
-      image_latest: ${{ steps.meta.outputs.image_latest }}
 
     steps:
       # Step 1: Download application source code from the current repo
@@ -98,31 +96,51 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       # Step 8: Generate image tags and expose them to later steps and next job
+      # - name: Create image tags
+      #   id: meta
+      #   shell: bash
+      #   run: |
+      #     set -euo pipefail
+
+      #     SHORT_SHA="${GITHUB_SHA::7}"
+      #     VERSION="v${SHORT_SHA}-${GITHUB_RUN_NUMBER}"
+      #     IMAGE_VERSION="${IMAGE_NAME}:${VERSION}"
+      #     IMAGE_LATEST="${IMAGE_NAME}:latest"
+
+      #     echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+      #     echo "SHORT_SHA=$SHORT_SHA" >> "$GITHUB_ENV"
+      #     echo "IMAGE_VERSION=$IMAGE_VERSION" >> "$GITHUB_ENV"
+      #     echo "IMAGE_LATEST=$IMAGE_LATEST" >> "$GITHUB_ENV"
+
+      #     # Only pass the non-secret value to the next job
+      #     echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      #     echo "DEBUG version=$VERSION"
+      #     echo "DEBUG image_version=$IMAGE_VERSION"
+      #     echo "DEBUG image_latest=$IMAGE_LATEST"
+
       - name: Create image tags
         id: meta
         shell: bash
-        env:
-          IMAGE_NAME: ${{ env.IMAGE_NAME }}
         run: |
           set -euo pipefail
 
-          SHORT_SHA="${GITHUB_SHA::7}"
-          VERSION="v${SHORT_SHA}-${GITHUB_RUN_NUMBER}"
+          # Format: MMDD-HHMM (UTC time)
+          SHORT_SHA="${GITHUB_SHA::4}"
+          VERSION="$(date -u +'%m%d%H%M')-${SHORT_SHA}"
+
           IMAGE_VERSION="${IMAGE_NAME}:${VERSION}"
           IMAGE_LATEST="${IMAGE_NAME}:latest"
 
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
-          echo "SHORT_SHA=$SHORT_SHA" >> "$GITHUB_ENV"
           echo "IMAGE_VERSION=$IMAGE_VERSION" >> "$GITHUB_ENV"
           echo "IMAGE_LATEST=$IMAGE_LATEST" >> "$GITHUB_ENV"
 
+          # Only pass version to next job
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "image_version=$IMAGE_VERSION" >> "$GITHUB_OUTPUT"
-          echo "image_latest=$IMAGE_LATEST" >> "$GITHUB_OUTPUT"
 
           echo "DEBUG version=$VERSION"
           echo "DEBUG image_version=$IMAGE_VERSION"
-          echo "DEBUG image_latest=$IMAGE_LATEST"
 
       # Step 9: Run SonarQube code analysis
       - name: SonarQube Cloud Scan
@@ -191,11 +209,12 @@ jobs:
       GITOPS_REPO: ${{ vars.ARGOCD_REPO }}
       GITOPS_BRANCH: ${{ vars.ARGOCD_BRANCH }}
       GITOPS_MANIFEST_PATH: ${{ vars.ARGOCD_MANIFEST_PATH }}
+      IMAGE_NAME: ${{ secrets.DOCKER_USERNAME }}/demo-app
 
       # Pull values from the build job outputs
       VERSION: ${{ needs.build.outputs.version }}
-      IMAGE_VERSION: ${{ needs.build.outputs.image_version }}
-      IMAGE_LATEST: ${{ needs.build.outputs.image_latest }}
+      IMAGE_VERSION: ${{ secrets.DOCKER_USERNAME }}/demo-app:${{ needs.build.outputs.version }}
+      IMAGE_LATEST: ${{ secrets.DOCKER_USERNAME }}/demo-app:latest
 
     steps:
       # Step 14: Show received values from the build job for debugging
