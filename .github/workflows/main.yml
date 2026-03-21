@@ -247,7 +247,14 @@ jobs:
           curl -sSL -o argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
           chmod +x argocd
           sudo mv argocd /usr/local/bin/argocd
-          
+
+      - name: Log in to ArgoCD
+        run: |
+          argocd login ${{ secrets.ARGOCD_SERVER }} \
+            --username ${{ secrets.ARGOCD_USERNAME }} \
+            --password ${{ secrets.ARGOCD_PASSWORD }} \
+            --insecure
+
       # Step 16: Confirm the manifest file exists before modifying it
       - name: Validate GitOps manifest path exists
         shell: bash
