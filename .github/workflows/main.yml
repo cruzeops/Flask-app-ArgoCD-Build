@@ -295,4 +295,7 @@ jobs:
           set -euo pipefail
           cd gitops
           git push origin "${GITOPS_BRANCH}"
+
+      - name: Refresh ArgoCD App and Sync
+        run: argocd app sync demo-app
 ####
