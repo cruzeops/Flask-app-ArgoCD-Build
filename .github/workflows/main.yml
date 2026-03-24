@@ -192,7 +192,7 @@ jobs:
 
       # Pull values from the build job outputs
       VERSION: ${{ needs.build_job.outputs.version }}
-      IMAGE_VERSION: ${{ secrets.DOCKER_USERNAME }}/demo-app:${{ needs.build.outputs.version }}
+      IMAGE_VERSION: ${{ secrets.DOCKER_USERNAME }}/demo-app:${{ needs.build_job.outputs.version }}
       IMAGE_LATEST: ${{ secrets.DOCKER_USERNAME }}/demo-app:latest
 
     steps:
